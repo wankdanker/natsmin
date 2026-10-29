@@ -391,7 +391,7 @@ func (s *Server) registerKV() {
 		if err != nil {
 			return
 		}
-		defer w.Stop()
+		defer func() { _ = w.Stop() }()
 		keepalive := time.NewTicker(15 * time.Second)
 		defer keepalive.Stop()
 		for {

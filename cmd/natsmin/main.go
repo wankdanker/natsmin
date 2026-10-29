@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -13,9 +12,11 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strconv"
+	"strings"
 	"syscall"
 	"time"
+
+	clyops "github.com/wankdanker/clyops/packages/go"
 
 	"github.com/wankdanker/natsmin/internal/api"
 	"github.com/wankdanker/natsmin/internal/auth"
@@ -26,69 +27,91 @@ import (
 	"github.com/wankdanker/natsmin/web"
 )
 
-func env(key, def string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return def
-}
+// cli declares the natsmin commands and options. Option variables double as the
+// environment variables that set them.
+func cli() *clyops.Cli {
+	c := clyops.New()
+	c.SetDescription("natsmin: management UI and HTTP API for NATS.")
 
-func envDur(key string, def time.Duration) time.Duration {
-	if v := os.Getenv(key); v != "" {
-		if d, err := time.ParseDuration(v); err == nil {
-			return d
-		}
-	}
-	return def
-}
+	srv := c.Command("serve", "Serve the natsmin UI and API")
+	srv.SetEffects("network")
+	srv.Opt("NATSMIN_ADDR", "addr", "a", ":8080", "Listen address", "Server")
+	srv.Opt("NATSMIN_DATA", "data", "d", "./data", "Directory for the database and secret key", "Server", "path")
+	srv.Opt("NATSMIN_POLL_INTERVAL", "poll", "", "5s", "Monitoring poll interval (Go duration)", "Server", `regex:^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$`)
+	srv.Opt("NATSMIN_TLS_CERT", "tls-cert", "", "optional", "Serve HTTPS with this certificate", "TLS", "file:readable")
+	srv.Opt("NATSMIN_TLS_KEY", "tls-key", "", "optional", "Key for --tls-cert", "TLS", "file:readable")
+	srv.Opt("NATSMIN_SECURE_COOKIES", "secure-cookies", "", "flag", "Mark session cookies Secure (enable behind HTTPS)", "Security")
+	srv.Opt("NATSMIN_ALLOW_SETUP", "allow-setup", "", "true", "Let the first visitor create the admin when no users exist", "Security", "bool")
+	srv.Opt("NATSMIN_SECRET_KEY", "secret-key", "", "optional", "Base64 32-byte key for stored credentials; generated in the data directory when unset", "Security", "secret")
+	srv.Opt("NATSMIN_ADMIN_USER", "admin-user", "", "optional", "Create this admin on startup when no users exist", "Security")
+	srv.Opt("NATSMIN_ADMIN_PASSWORD", "admin-password", "", "optional", "Password for --admin-user", "Security", "secret")
+	srv.Opt("NATSMIN_LOG_JSON", "log-json", "", "flag", "Log as JSON", "Logging")
+	srv.Requires("tls-cert", "tls-key")
+	srv.Requires("tls-key", "tls-cert")
+	srv.Requires("admin-user", "admin-password")
 
-func envBool(key string, def bool) bool {
-	if v := os.Getenv(key); v != "" {
-		if b, err := strconv.ParseBool(v); err == nil {
-			return b
-		}
-	}
-	return def
+	c.Command("openapi", "Print the OpenAPI document of the natsmin API").
+		SetEffects("read-only").
+		SetStdout("OpenAPI 3.1 document", "application/json")
+	c.Command("version", "Print the natsmin version").
+		SetEffects("read-only").
+		SetStdout("Version and commit", "application/json")
+	return c
 }
 
 func main() {
-	if len(os.Args) > 1 {
-		switch os.Args[1] {
-		case "openapi":
-			dumpOpenAPI()
-			return
-		case "version", "--version", "-v":
-			fmt.Println("natsmin", version.Version, version.Commit)
-			return
-		}
+	c := cli()
+	v := c.Run()
+	switch strings.Join(c.CommandPath(), " ") {
+	case "openapi":
+		dumpOpenAPI()
+		return
+	case "version":
+		_ = json.NewEncoder(os.Stdout).Encode(map[string]string{"version": version.Version, "commit": version.Commit})
+		return
 	}
 
-	addr := flag.String("addr", env("NATSMIN_ADDR", ":8080"), "listen address (NATSMIN_ADDR)")
-	dataDir := flag.String("data", env("NATSMIN_DATA", "./data"), "data directory for the database and secret key (NATSMIN_DATA)")
-	poll := flag.Duration("poll", envDur("NATSMIN_POLL_INTERVAL", 5*time.Second), "monitoring poll interval (NATSMIN_POLL_INTERVAL)")
-	secure := flag.Bool("secure-cookies", envBool("NATSMIN_SECURE_COOKIES", false), "mark session cookies Secure; enable behind HTTPS (NATSMIN_SECURE_COOKIES)")
-	allowSetup := flag.Bool("allow-setup", envBool("NATSMIN_ALLOW_SETUP", true), "let the first visitor create the admin when no users exist (NATSMIN_ALLOW_SETUP)")
-	tlsCert := flag.String("tls-cert", env("NATSMIN_TLS_CERT", ""), "serve HTTPS with this certificate (NATSMIN_TLS_CERT)")
-	tlsKey := flag.String("tls-key", env("NATSMIN_TLS_KEY", ""), "key for -tls-cert (NATSMIN_TLS_KEY)")
-	logJSON := flag.Bool("log-json", envBool("NATSMIN_LOG_JSON", false), "log as JSON (NATSMIN_LOG_JSON)")
-	flag.Parse()
-
+	poll, err := time.ParseDuration(v.String("NATSMIN_POLL_INTERVAL"))
+	if err != nil || poll <= 0 {
+		fmt.Fprintf(os.Stderr, "natsmin: --poll must be a positive duration, got %q\n", v.String("NATSMIN_POLL_INTERVAL"))
+		os.Exit(1)
+	}
 	var handler slog.Handler = slog.NewTextHandler(os.Stderr, nil)
-	if *logJSON {
+	if v.Bool("NATSMIN_LOG_JSON") {
 		handler = slog.NewJSONHandler(os.Stderr, nil)
 	}
 	log := slog.New(handler)
-	if err := run(log, *addr, *dataDir, *poll, *secure || *tlsCert != "", *allowSetup, *tlsCert, *tlsKey); err != nil {
+	cfg := config{
+		addr:       v.String("NATSMIN_ADDR"),
+		dataDir:    v.String("NATSMIN_DATA"),
+		poll:       poll,
+		tlsCert:    v.String("NATSMIN_TLS_CERT"),
+		tlsKey:     v.String("NATSMIN_TLS_KEY"),
+		allowSetup: v.Bool("NATSMIN_ALLOW_SETUP"),
+		secretKey:  v.String("NATSMIN_SECRET_KEY"),
+		adminUser:  v.String("NATSMIN_ADMIN_USER"),
+		adminPass:  v.String("NATSMIN_ADMIN_PASSWORD"),
+	}
+	cfg.secure = v.Bool("NATSMIN_SECURE_COOKIES") || cfg.tlsCert != ""
+	if err := run(log, cfg); err != nil {
 		log.Error("fatal", "err", err)
 		os.Exit(1)
 	}
 }
 
-func run(log *slog.Logger, addr, dataDir string, poll time.Duration, secure, allowSetup bool, tlsCert, tlsKey string) error {
+type config struct {
+	addr, dataDir, tlsCert, tlsKey  string
+	poll                            time.Duration
+	secure, allowSetup              bool
+	secretKey, adminUser, adminPass string
+}
+
+func run(log *slog.Logger, c config) error {
+	addr, dataDir, poll, secure, allowSetup, tlsCert, tlsKey := c.addr, c.dataDir, c.poll, c.secure, c.allowSetup, c.tlsCert, c.tlsKey
 	if err := os.MkdirAll(dataDir, 0o700); err != nil {
 		return err
 	}
-	box, err := secret.Load(os.Getenv("NATSMIN_SECRET_KEY"), filepath.Join(dataDir, "secret.key"))
+	box, err := secret.Load(c.secretKey, filepath.Join(dataDir, "secret.key"))
 	if err != nil {
 		return fmt.Errorf("secret key: %w", err)
 	}
@@ -101,7 +124,7 @@ func run(log *slog.Logger, addr, dataDir string, poll time.Duration, secure, all
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	if err := bootstrapAdmin(ctx, st, log); err != nil {
+	if err := bootstrapAdmin(ctx, st, log, c.adminUser, c.adminPass); err != nil {
 		return err
 	}
 
@@ -156,12 +179,11 @@ func run(log *slog.Logger, addr, dataDir string, poll time.Duration, secure, all
 
 // bootstrapAdmin creates the admin from NATSMIN_ADMIN_USER/PASSWORD when no
 // users exist yet.
-func bootstrapAdmin(ctx context.Context, st *store.Store, log *slog.Logger) error {
+func bootstrapAdmin(ctx context.Context, st *store.Store, log *slog.Logger, user, pass string) error {
 	n, err := st.CountUsers(ctx)
 	if err != nil || n > 0 {
 		return err
 	}
-	user, pass := os.Getenv("NATSMIN_ADMIN_USER"), os.Getenv("NATSMIN_ADMIN_PASSWORD")
 	if user == "" || pass == "" {
 		log.Info("no users yet: open the UI to create the first admin, or set NATSMIN_ADMIN_USER and NATSMIN_ADMIN_PASSWORD")
 		return nil
