@@ -9,6 +9,8 @@ permissions:
   packages: write
   id-token: write
   attestations: write
+  # attest-build-provenance v4 records the pushed image as an artifact.
+  artifact-metadata: write
 
 jobs:
   binaries:
