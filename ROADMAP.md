@@ -12,15 +12,17 @@
 
 ## Next
 
-- **OIDC login** (GitHub, Google, Okta, Keycloak) with group-to-role mapping
-- **Alerting**: threshold rules on any snapshot metric (lagging replicas, slow consumers, consumer backlog, storage) with webhook, Slack and email targets, plus an alert history
-- **Operator mode management**: browse operators, accounts and users from JWTs; create and revoke users and signing keys; push account JWTs to the resolver
-- **Per-system and per-account permissions** for users and tokens
-- **Stream backup and restore** to a file or object store bucket
-- **Mirrors and sources editor** in the stream form; subject transform previews
-- **Consumer message inspection**: show what is pending and redelivered for a consumer
-- **Persisted metrics history** (optional) and a Prometheus `/metrics` endpoint for natsmin itself
-- **Guided rolling upgrade**: lame-duck a server, wait for clients and replicas to move, verify health, continue
-- **JetStream domains**: target a domain from an account connection (leafnode JetStream)
-- **CLI** generated from the OpenAPI document, and a Terraform provider
-- **MCP endpoint** so AI agents can operate systems through the same API and roles
+The backlog lives in [GitHub issues](https://github.com/wankdanker/natsmin/issues). Issues labelled [`roadmap`](https://github.com/wankdanker/natsmin/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap) are the planned features:
+
+- [#1](https://github.com/wankdanker/natsmin/issues/1) OIDC login with group-to-role mapping
+- [#2](https://github.com/wankdanker/natsmin/issues/2) Alerting with webhook, Slack and email targets
+- [#3](https://github.com/wankdanker/natsmin/issues/3) / [#4](https://github.com/wankdanker/natsmin/issues/4) Operator mode: browse, then manage accounts, users and signing keys
+- [#5](https://github.com/wankdanker/natsmin/issues/5) Per-system and per-account permissions
+- [#6](https://github.com/wankdanker/natsmin/issues/6) Stream backup and restore
+- [#7](https://github.com/wankdanker/natsmin/issues/7) Mirrors, sources, republish and subject transforms in the stream form
+- [#8](https://github.com/wankdanker/natsmin/issues/8) Consumer inspection
+- [#9](https://github.com/wankdanker/natsmin/issues/9) Persisted metrics history, [#10](https://github.com/wankdanker/natsmin/issues/10) Prometheus `/metrics`
+- [#11](https://github.com/wankdanker/natsmin/issues/11) Guided server maintenance and rolling upgrades
+- [#12](https://github.com/wankdanker/natsmin/issues/12) JetStream domains
+- [#13](https://github.com/wankdanker/natsmin/issues/13) CLI, [#14](https://github.com/wankdanker/natsmin/issues/14) Terraform provider, [#15](https://github.com/wankdanker/natsmin/issues/15) MCP endpoint
+- [#18](https://github.com/wankdanker/natsmin/issues/18) Homebrew, Helm and install script
