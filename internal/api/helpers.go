@@ -263,7 +263,17 @@ func (l *loginLimiter) blocked(key string) bool {
 func (l *loginLimiter) failed(key string) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.fail[key] = append(l.fail[key], time.Now())
+	now := time.Now()
+	if len(l.fail) > 10000 {
+		// Drop keys whose failures are all outside the window.
+		cut := now.Add(-loginWindow)
+		for k, ts := range l.fail {
+			if len(ts) == 0 || ts[len(ts)-1].Before(cut) {
+				delete(l.fail, k)
+			}
+		}
+	}
+	l.fail[key] = append(l.fail[key], now)
 }
 
 func (l *loginLimiter) reset(key string) {

@@ -64,7 +64,10 @@ func (s *Server) registerAuth() {
 			if err != nil {
 				return nil, apiErr(err)
 			}
-			u, err := s.store.CreateUser(ctx, in.Body.Username, hash, store.RoleAdmin)
+			u, err := s.store.CreateFirstUser(ctx, in.Body.Username, hash, store.RoleAdmin)
+			if errors.Is(err, store.ErrConflict) {
+				return nil, huma.Error409Conflict("setup already completed")
+			}
 			if err != nil {
 				return nil, apiErr(err)
 			}

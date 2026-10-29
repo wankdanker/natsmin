@@ -349,7 +349,7 @@ func (m *Manager) pollOnce(ctx context.Context, st *systemState) *Snapshot {
 			{"ROUTEZ", nil, &res.routez},
 			{"GATEWAYZ", nil, &res.gatewayz},
 			{"LEAFZ", nil, &res.leafz},
-			{"JSZ", nil, &res.jsz},
+			{"JSZ", map[string]any{"raft": true}, &res.jsz},
 			{"HEALTHZ", nil, &res.healthz},
 		}
 		var errMu sync.Mutex
@@ -416,7 +416,7 @@ func (m *Manager) failedSnapshot(st *systemState, now time.Time, err error) *Sna
 	st.mu.Lock()
 	prev := st.snapshot
 	st.mu.Unlock()
-	snap := &Snapshot{SystemID: st.sys.ID, Time: now, Error: err.Error(),
+	snap := &Snapshot{SystemID: st.sys.ID, Time: now, Error: err.Error(), Totals: Totals{Versions: []string{}},
 		Servers: []ServerNode{}, Clusters: []ClusterSummary{}, Routes: []RouteEdge{}, Gateways: []GatewayEdge{}, Leafnodes: []LeafEdge{}}
 	if prev != nil {
 		// Keep the last known layout so the UI can still show it, marked stale.

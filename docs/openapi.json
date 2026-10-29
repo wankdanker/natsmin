@@ -152,10 +152,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "slowConsumers": {
             "format": "int64",
@@ -265,10 +262,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "required": [
@@ -371,19 +365,13 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "tags": {
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "tlsVersion": {
             "type": "string"
@@ -424,10 +412,7 @@
             "items": {
               "$ref": "#/components/schemas/ConnOut"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "limit": {
             "format": "int64",
@@ -694,10 +679,7 @@
             "items": {
               "$ref": "#/components/schemas/ErrorDetail"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "instance": {
             "description": "A URI reference that identifies the specific occurrence of the problem.",
@@ -798,10 +780,7 @@
             "items": {
               "$ref": "#/components/schemas/ServerInterest"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "subject": {
             "type": "string"
@@ -876,10 +855,7 @@
             "items": {
               "$ref": "#/components/schemas/MetaPeer"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "storage": {
             "format": "int64",
@@ -1182,10 +1158,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "truncated": {
             "type": "boolean"
@@ -1204,10 +1177,7 @@
             "items": {
               "$ref": "#/components/schemas/ObjInfoOut"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "status": {
             "$ref": "#/components/schemas/ObjStatusOut"
@@ -1258,10 +1228,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "type": "object"
@@ -1352,10 +1319,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "required": [
@@ -1375,10 +1339,7 @@
               "items": {
                 "type": "string"
               },
-              "type": [
-                "array",
-                "null"
-              ]
+              "type": "array"
             },
             "type": "object"
           },
@@ -1422,10 +1383,7 @@
             "items": {
               "$ref": "#/components/schemas/MsgOut"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "nextSeq": {
             "format": "int64",
@@ -1512,10 +1470,7 @@
               "items": {
                 "type": "string"
               },
-              "type": [
-                "array",
-                "null"
-              ]
+              "type": "array"
             },
             "type": "object"
           },
@@ -1623,10 +1578,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "type": "object"
@@ -1680,10 +1632,7 @@
               "items": {
                 "type": "string"
               },
-              "type": [
-                "array",
-                "null"
-              ]
+              "type": "array"
             },
             "type": "object"
           },
@@ -1896,10 +1845,7 @@
               "items": {
                 "type": "string"
               },
-              "type": [
-                "array",
-                "null"
-              ]
+              "type": "array"
             },
             "type": "object"
           },
@@ -2007,10 +1953,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "time": {
             "format": "date-time",
@@ -2045,10 +1988,7 @@
             "items": {
               "$ref": "#/components/schemas/SubOut"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "required": [
@@ -2269,10 +2209,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "totalConnections": {
             "format": "int64",
@@ -2327,10 +2264,7 @@
             "items": {
               "$ref": "#/components/schemas/ClusterSummary"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "connected": {
             "type": "boolean"
@@ -2342,10 +2276,7 @@
             "items": {
               "$ref": "#/components/schemas/GatewayEdge"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "jetstream": {
             "$ref": "#/components/schemas/JetStreamSummary"
@@ -2354,28 +2285,19 @@
             "items": {
               "$ref": "#/components/schemas/LeafEdge"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "routes": {
             "items": {
               "$ref": "#/components/schemas/RouteEdge"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "servers": {
             "items": {
               "$ref": "#/components/schemas/ServerNode"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "systemId": {
             "type": "string"
@@ -2479,19 +2401,13 @@
             "items": {
               "$ref": "#/components/schemas/ReplicaOut"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "sources": {
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "storage": {
             "type": "string"
@@ -2503,10 +2419,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "required": [
@@ -2567,10 +2480,7 @@
             "items": {
               "$ref": "#/components/schemas/AccountIn"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "description": {
             "maxLength": 1000,
@@ -2603,10 +2513,7 @@
               "type": "string"
             },
             "minItems": 1,
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "required": [
@@ -2622,10 +2529,7 @@
             "items": {
               "$ref": "#/components/schemas/AccountOut"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "createdAt": {
             "format": "date-time",
@@ -2657,10 +2561,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "required": [
@@ -2723,10 +2624,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "required": [
@@ -2810,10 +2708,7 @@
               "items": {
                 "type": "string"
               },
-              "type": [
-                "array",
-                "null"
-              ]
+              "type": "array"
             },
             "type": "object"
           },
@@ -2873,10 +2768,7 @@
               "type": "string"
             },
             "minItems": 1,
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "required": [
@@ -2897,10 +2789,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           },
           "error": {
             "type": "string"
@@ -3003,10 +2892,7 @@
             "items": {
               "type": "string"
             },
-            "type": [
-              "array",
-              "null"
-            ]
+            "type": "array"
           }
         },
         "required": [
@@ -3168,10 +3054,7 @@
                   "items": {
                     "$ref": "#/components/schemas/AuditEntry"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -3445,10 +3328,7 @@
                   "items": {
                     "$ref": "#/components/schemas/SystemOut"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -3716,10 +3596,7 @@
                   "items": {
                     "$ref": "#/components/schemas/AccountStatOut"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -3766,10 +3643,7 @@
                   "items": {
                     "$ref": "#/components/schemas/AccountOut"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -4047,10 +3921,7 @@
               "application/json": {
                 "schema": {
                   "items": {},
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -4370,10 +4241,7 @@
               "application/json": {
                 "schema": {
                   "items": {},
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -5456,10 +5324,7 @@
                   "items": {
                     "$ref": "#/components/schemas/KVStatusOut"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -6003,10 +5868,7 @@
                   "items": {
                     "$ref": "#/components/schemas/KVEntryOut"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -6266,10 +6128,7 @@
                   "items": {
                     "$ref": "#/components/schemas/ObjStatusOut"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -7246,10 +7105,7 @@
                   "items": {
                     "$ref": "#/components/schemas/RatePoint"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -7370,10 +7226,7 @@
                   "items": {
                     "$ref": "#/components/schemas/StreamPlacement"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -7620,10 +7473,7 @@
                   "items": {
                     "$ref": "#/components/schemas/MonitorResponse"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -7904,10 +7754,7 @@
                   "items": {
                     "$ref": "#/components/schemas/APIToken"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },
@@ -8018,10 +7865,7 @@
                   "items": {
                     "$ref": "#/components/schemas/User"
                   },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
+                  "type": "array"
                 }
               }
             },

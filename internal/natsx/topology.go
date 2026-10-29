@@ -366,7 +366,7 @@ type pollResult struct {
 // buildSnapshot turns poll responses into a Snapshot, computing rates against
 // the previous snapshot.
 func buildSnapshot(systemID string, now time.Time, res pollResult, prev *Snapshot) *Snapshot {
-	snap := &Snapshot{SystemID: systemID, Time: now, Connected: true,
+	snap := &Snapshot{SystemID: systemID, Time: now, Connected: true, Totals: Totals{Versions: []string{}},
 		Servers: []ServerNode{}, Clusters: []ClusterSummary{}, Routes: []RouteEdge{}, Gateways: []GatewayEdge{}, Leafnodes: []LeafEdge{}}
 	prevByID := map[string]*ServerNode{}
 	if prev != nil {
@@ -491,6 +491,16 @@ func buildSnapshot(systemID string, now time.Time, res pollResult, prev *Snapsho
 		}
 	}
 	if js != nil {
+		if js.Streams == 0 {
+			// Servers older than 2.10 do not report leader counts; the largest
+			// per-server count is a lower bound.
+			for _, n := range nodes {
+				if n.JetStream != nil {
+					js.Streams = max(js.Streams, n.JetStream.Streams)
+					js.Consumers = max(js.Consumers, n.JetStream.Consumers)
+				}
+			}
+		}
 		sort.Slice(js.Peers, func(i, k int) bool { return js.Peers[i].Name < js.Peers[k].Name })
 		snap.JetStream = js
 	}

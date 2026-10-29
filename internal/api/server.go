@@ -28,6 +28,12 @@ type Config struct {
 	AllowSetup bool
 }
 
+func init() {
+	// Handlers always return empty slices rather than nil, so arrays are
+	// documented as non-nullable.
+	huma.DefaultArrayNullable = false
+}
+
 // Server wires the API to its dependencies.
 type Server struct {
 	cfg     Config

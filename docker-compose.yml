@@ -1,0 +1,39 @@
+# A 3-node JetStream cluster and natsmin.
+#   docker compose up --build
+# Open http://localhost:8080 (admin / changeme), then add a system with
+#   URL nats://nats-1:4222, system account sys/sys, account connection app/app.
+services:
+  nats-1: &nats
+    image: nats:2.15-alpine
+    command: ["-c", "/etc/nats/nats.conf"]
+    volumes:
+      - ./dev/docker/nats-1.conf:/etc/nats/nats.conf:ro
+      - nats-1:/data
+    ports: ["4222:4222"]
+  nats-2:
+    <<: *nats
+    volumes:
+      - ./dev/docker/nats-2.conf:/etc/nats/nats.conf:ro
+      - nats-2:/data
+    ports: []
+  nats-3:
+    <<: *nats
+    volumes:
+      - ./dev/docker/nats-3.conf:/etc/nats/nats.conf:ro
+      - nats-3:/data
+    ports: []
+  natsmin:
+    build: .
+    environment:
+      NATSMIN_ADMIN_USER: admin
+      NATSMIN_ADMIN_PASSWORD: changeme
+    volumes:
+      - natsmin:/data
+    ports: ["8080:8080"]
+    depends_on: [nats-1, nats-2, nats-3]
+
+volumes:
+  nats-1:
+  nats-2:
+  nats-3:
+  natsmin:

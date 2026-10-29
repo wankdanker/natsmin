@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -20,6 +21,7 @@ func main() {
 	clusters := flag.String("clusters", "east,west", "comma separated cluster names")
 	size := flag.Int("size", 3, "servers per cluster")
 	leaf := flag.Bool("leaf", true, "add a leafnode server with JetStream domain \"edge\"")
+	demo := flag.Bool("demo", false, "seed streams, KV and objects in the APP account and generate traffic")
 	flag.Parse()
 
 	cfg := devcluster.Config{Dir: *dir, BasePort: *base, Clusters: strings.Split(*clusters, ","), ServersPerCluster: *size, Leaf: *leaf, Monitoring: true}
@@ -38,8 +40,16 @@ func main() {
 		devcluster.SysUser, devcluster.SysPass, devcluster.AppUser, devcluster.AppPass, devcluster.EdgeUser, devcluster.EdgePass)
 	fmt.Println("press ctrl-c to stop")
 
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-	<-sig
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	if *demo {
+		go func() {
+			if err := devcluster.Demo(ctx, sc.URLs()); err != nil {
+				log.Printf("demo traffic: %v", err)
+			}
+		}()
+		fmt.Println("generating demo traffic in the APP account")
+	}
+	<-ctx.Done()
 	sc.Shutdown()
 }

@@ -99,6 +99,21 @@ func (s *Store) CreateUser(ctx context.Context, username, passwordHash string, r
 	return s.GetUser(ctx, id)
 }
 
+// CreateFirstUser inserts a user only when no users exist, atomically, and
+// returns ErrConflict otherwise.
+func (s *Store) CreateFirstUser(ctx context.Context, username, passwordHash string, role Role) (*User, error) {
+	res, err := s.db.ExecContext(ctx, `INSERT INTO users (username, password_hash, role, created_at)
+		SELECT ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM users)`, username, passwordHash, role, time.Now().Unix())
+	if err != nil {
+		return nil, err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return nil, ErrConflict
+	}
+	id, _ := res.LastInsertId()
+	return s.GetUser(ctx, id)
+}
+
 // GetUser loads a user by id.
 func (s *Store) GetUser(ctx context.Context, id int64) (*User, error) {
 	return scanUser(s.db.QueryRowContext(ctx, `SELECT `+userCols+` FROM users WHERE id = ?`, id))
