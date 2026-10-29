@@ -1,11 +1,13 @@
 # syntax=docker/dockerfile:1
 # Build stages run on the build machine's platform and cross-compile, so
 # multi-arch images do not need emulation.
-FROM --platform=$BUILDPLATFORM node:22-alpine AS ui
+FROM --platform=$BUILDPLATFORM node:24-alpine AS ui
 WORKDIR /src/ui
-RUN corepack enable
 COPY ui/package.json ui/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+# Install the pnpm version pinned in package.json. corepack is not bundled
+# with Node from version 25 on, so it is not relied on here.
+RUN npm install -g "pnpm@$(node -p "require('./package.json').packageManager.split('@')[1]")" \
+    && pnpm install --frozen-lockfile
 COPY ui/ ./
 RUN mkdir -p ../web/dist && pnpm run build
 
