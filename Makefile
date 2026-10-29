@@ -30,11 +30,11 @@ openapi:
 
 # Local supercluster with demo traffic (east/west clusters + a leafnode).
 devcluster:
-	go run ./cmd/natsmin-devcluster -demo
+	go run ./cmd/natsmin-devcluster --demo
 
 # API server on :8080; run `cd ui && pnpm dev` alongside for the UI with hot reload on :5173.
 dev:
-	go run ./cmd/natsmin -data ./data -poll 2s
+	go run ./cmd/natsmin serve --data ./data --poll 2s
 
 docker:
 	docker build -t natsmin:$(VERSION) .

@@ -30,3 +30,4 @@ VOLUME /data
 EXPOSE 8080
 USER nonroot
 ENTRYPOINT ["/natsmin"]
+CMD ["serve"]
