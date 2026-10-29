@@ -18,6 +18,13 @@ make dev
 cd ui && pnpm install && pnpm dev
 ```
 
+## Workflow
+
+- Pick an issue (the [roadmap issues](https://github.com/wankdanker/natsmin/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap) are the backlog) or open one first for larger changes.
+- Branch from `main` (`feature/oidc-login`, `fix/connz-paging`) and open a pull request. `main` only changes through pull requests.
+- CI must pass: Go tests and race detector, golangci-lint, svelte-check, a snapshot release build and the Docker build.
+- Releases are cut from `main` by tagging; see [RELEASING.md](RELEASING.md).
+
 ## Before you open a pull request
 
 ```bash

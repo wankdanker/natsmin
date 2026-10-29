@@ -1,0 +1,33 @@
+name: Bug report
+description: Something in natsmin does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you do, what did you expect, and what happened instead?
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Register a system with ...
+        2. Open ...
+  - type: input
+    id: version
+    attributes:
+      label: natsmin version
+      description: Shown on the login page, or `natsmin version`
+    validations: { required: true }
+  - type: input
+    id: nats
+    attributes:
+      label: NATS server version and topology
+      placeholder: 2.15.2, 3-node cluster with JetStream, operator mode
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      render: shell

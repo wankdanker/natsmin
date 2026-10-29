@@ -1,10 +1,30 @@
-# natsmin
+<p align="center">
+  <img src="docs/logo.svg" width="72" height="72" alt="">
+</p>
 
-A management UI and HTTP API for [NATS](https://nats.io): monitor and operate servers, clusters, superclusters and leafnodes, and manage JetStream streams, consumers, Key-Value buckets and object stores.
+<h1 align="center">natsmin</h1>
+
+<p align="center">
+  A management UI and HTTP API for <a href="https://nats.io">NATS</a>.<br>
+  Monitor and operate servers, clusters, superclusters and leafnodes. Manage JetStream streams, consumers, Key-Value and object stores.
+</p>
+
+<p align="center">
+  <a href="https://github.com/wankdanker/natsmin/actions/workflows/ci.yml"><img src="https://github.com/wankdanker/natsmin/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/wankdanker/natsmin/releases/latest"><img src="https://img.shields.io/github/v/release/wankdanker/natsmin?include_prereleases&sort=semver" alt="Release"></a>
+  <a href="https://github.com/wankdanker/natsmin/pkgs/container/natsmin"><img src="https://img.shields.io/badge/ghcr.io-natsmin-0f766e?logo=docker&logoColor=white" alt="Container image"></a>
+  <a href="https://goreportcard.com/report/github.com/wankdanker/natsmin"><img src="https://goreportcard.com/badge/github.com/wankdanker/natsmin" alt="Go Report Card"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/wankdanker/natsmin" alt="License"></a>
+</p>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/overview-dark.png">
+    <img src="docs/screenshots/overview.png" alt="natsmin system overview" width="900">
+  </picture>
+</p>
 
 natsmin is one Go binary with the UI built in. It talks to NATS the way the `nats` CLI does: through the system account for monitoring and maintenance, and through ordinary account users for JetStream and messaging. Nothing runs on your NATS servers.
-
-![Overview](docs/screenshots/overview.png)
 
 ## What it does
 
@@ -42,18 +62,48 @@ Everything the UI does is a documented HTTP API: OpenAPI 3.1 at `/api/openapi.js
 curl -H "Authorization: Bearer nm_..." http://localhost:8080/api/v1/systems/prod/jetstream/assets
 ```
 
+## Screenshots
+
 | | |
 |---|---|
-| ![Topology](docs/screenshots/topology.png) | ![JetStream placement](docs/screenshots/jetstream.png) |
-| ![Message browser](docs/screenshots/messages.png) | ![Live tail](docs/screenshots/tail.png) |
+| ![Topology](docs/screenshots/topology.png) **Topology:** clusters, routes, gateways and leafnodes | ![JetStream](docs/screenshots/jetstream.png) **JetStream:** meta group and replica placement across accounts |
+| ![Message browser](docs/screenshots/messages.png) **Message browser:** read by sequence, time or subject | ![Live tail](docs/screenshots/tail.png) **Publish and tail:** watch any subject live |
 
-## Quick start
+## Install
 
-### Try it with a local supercluster (no Docker needed)
+**Docker**
 
 ```bash
-make ui
+docker run -p 8080:8080 -v natsmin:/data ghcr.io/wankdanker/natsmin
 ```
+
+Images are published for `linux/amd64` and `linux/arm64`.
+
+**Binaries**
+
+Download an archive for Linux, macOS, Windows or FreeBSD from the [latest release](https://github.com/wankdanker/natsmin/releases/latest), then run:
+
+```bash
+./natsmin
+```
+
+**From source**
+
+```bash
+make ui build && ./bin/natsmin
+```
+
+Open http://localhost:8080 and create the admin account. Then add a system. You need:
+
+- **Server URLs**: one or more seed URLs; the rest of the cluster is discovered.
+- **System account credentials** for topology, health, connections and maintenance. Any user in the system account works (user/password, token, `.creds`, or nkey).
+- **Account connections**: one user per NATS account whose streams, KV buckets and object stores you want to manage.
+
+Operator mode (JWT) and static config auth both work.
+
+## Try it without a NATS deployment
+
+The `natsmin-devcluster` tool starts two 3-node clusters (`east`, `west`) joined by gateways, plus a leafnode, in a single process, and can generate demo traffic. It is included in the release archives.
 
 ```bash
 go run ./cmd/natsmin-devcluster -demo
@@ -63,29 +113,13 @@ go run ./cmd/natsmin-devcluster -demo
 go run ./cmd/natsmin
 ```
 
-The dev cluster starts two 3-node clusters (`east`, `west`) joined by gateways, plus a leafnode, in one process, and generates demo traffic. Open http://localhost:8080, create the admin account, and add a system with URL `nats://localhost:4222`, system account `sys` / `sys`, and an account connection `app` / `app`.
+Add a system with URL `nats://localhost:4222`, system account `sys` / `sys`, and an account connection `app` / `app`.
 
-### Docker Compose
+Or with Docker Compose (3-node JetStream cluster plus natsmin, login `admin` / `changeme`, system URL `nats://nats-1:4222`):
 
 ```bash
 docker compose up --build
 ```
-
-Starts a 3-node JetStream cluster and natsmin on http://localhost:8080 (login `admin` / `changeme`). Add the system with URL `nats://nats-1:4222`.
-
-### Run against your own NATS
-
-```bash
-docker run -p 8080:8080 -v natsmin:/data natsmin
-```
-
-Then add a system in the UI. You need:
-
-- **Server URLs**: one or more seed URLs; the rest of the cluster is discovered.
-- **System account credentials** for topology, health, connections and maintenance. Any user in the system account works (user/password, token, `.creds`, or nkey).
-- **Account connections**: one user per NATS account whose streams, KV buckets and object stores you want to manage.
-
-Operator mode (JWT) and static config auth both work.
 
 ## Configuration
 
@@ -125,11 +159,11 @@ cd ui && pnpm install && pnpm dev   # terminal 3: UI with hot reload on :5173
 
 `make test` runs the Go tests, which start real in-process NATS superclusters. `make check` runs vet, gofmt and the Svelte type checker. After changing the API, `make openapi` regenerates `docs/openapi.json` and the UI's typed client.
 
-See [docs/architecture.md](docs/architecture.md) for how the pieces fit together, and [CONTRIBUTING.md](CONTRIBUTING.md).
+See [docs/architecture.md](docs/architecture.md) for how the pieces fit together, [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, and [RELEASING.md](RELEASING.md) for cutting releases.
 
 ## Roadmap
 
-See [ROADMAP.md](ROADMAP.md). The next items are OIDC login, alerting rules with webhooks, account and user JWT management for operator mode, stream backup and restore, and per-system role scoping.
+Planned work is tracked as [GitHub issues](https://github.com/wankdanker/natsmin/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap); [ROADMAP.md](ROADMAP.md) has the overview. Up next: OIDC login, alerting with webhooks, operator-mode account and user management, stream backup and restore, and per-system permissions.
 
 ## License
 
