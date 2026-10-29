@@ -8,6 +8,7 @@ require (
 	github.com/nats-io/nats-server/v2 v2.15.2
 	github.com/nats-io/nats.go v1.55.0
 	github.com/nats-io/nkeys v0.4.16
+	github.com/wankdanker/clyops/packages/go v0.9.0
 	golang.org/x/crypto v0.58.0
 	modernc.org/sqlite v1.61.0
 )

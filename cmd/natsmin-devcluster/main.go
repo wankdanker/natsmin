@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,19 +11,26 @@ import (
 	"strings"
 	"syscall"
 
+	clyops "github.com/wankdanker/clyops/packages/go"
+
 	"github.com/wankdanker/natsmin/internal/devcluster"
 )
 
 func main() {
-	dir := flag.String("dir", ".devcluster", "directory for configs and JetStream data")
-	base := flag.Int("port", 4222, "first client port")
-	clusters := flag.String("clusters", "east,west", "comma separated cluster names")
-	size := flag.Int("size", 3, "servers per cluster")
-	leaf := flag.Bool("leaf", true, "add a leafnode server with JetStream domain \"edge\"")
-	demo := flag.Bool("demo", false, "seed streams, KV and objects in the APP account and generate traffic")
-	flag.Parse()
+	cli := clyops.New()
+	cli.SetDescription("Run a local NATS supercluster (and optionally demo traffic) for developing and trying natsmin.")
+	cli.SetEffects("network")
+	cli.Opt("DEVCLUSTER_DIR", "dir", "d", ".devcluster", "Directory for configs and JetStream data", "Cluster", "path")
+	cli.Opt("DEVCLUSTER_PORT", "port", "p", "4222", "First client port; other ports are offset from it", "Cluster", "port")
+	cli.Opt("DEVCLUSTER_CLUSTERS", "clusters", "c", "east,west", "Comma separated cluster names", "Cluster", `regex:^[A-Za-z0-9_-]+(,[A-Za-z0-9_-]+)*$`)
+	cli.Opt("DEVCLUSTER_SIZE", "size", "s", "3", "Servers per cluster", "Cluster", "int:1-9")
+	cli.Opt("DEVCLUSTER_LEAF", "leaf", "", "true", "Add a leafnode server with JetStream domain \"edge\"", "Cluster", "bool")
+	cli.Opt("DEVCLUSTER_DEMO", "demo", "", "flag", "Seed streams, KV and objects in the APP account and generate traffic", "Demo")
+	v := cli.Run()
 
-	cfg := devcluster.Config{Dir: *dir, BasePort: *base, Clusters: strings.Split(*clusters, ","), ServersPerCluster: *size, Leaf: *leaf, Monitoring: true}
+	cfg := devcluster.Config{Dir: v.String("DEVCLUSTER_DIR"), BasePort: v.Int("DEVCLUSTER_PORT"),
+		Clusters: strings.Split(v.String("DEVCLUSTER_CLUSTERS"), ","), ServersPerCluster: v.Int("DEVCLUSTER_SIZE"),
+		Leaf: v.Bool("DEVCLUSTER_LEAF"), Monitoring: true}
 	sc, err := devcluster.Start(cfg)
 	if err != nil {
 		log.Fatal(err)
@@ -42,7 +48,7 @@ func main() {
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	if *demo {
+	if v.Bool("DEVCLUSTER_DEMO") {
 		go func() {
 			if err := devcluster.Demo(ctx, sc.URLs()); err != nil {
 				log.Printf("demo traffic: %v", err)
