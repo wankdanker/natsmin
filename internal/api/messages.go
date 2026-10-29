@@ -156,7 +156,7 @@ func (s *Server) registerMessages() {
 	}, send sse.Sender) {
 		nc, err := s.conn(ctx, in.AccountPath)
 		if err != nil {
-			_ = send(sse.Message{ID: 0, Data: map[string]string{"error": err.Error()}})
+			_ = send.Data(map[string]string{"error": err.Error()})
 			return
 		}
 		ch := make(chan *nats.Msg, 512)
@@ -167,7 +167,7 @@ func (s *Server) registerMessages() {
 			sub, err = nc.ChanSubscribe(in.Subject, ch)
 		}
 		if err != nil {
-			_ = send(sse.Message{Data: map[string]string{"error": err.Error()}})
+			_ = send.Data(map[string]string{"error": err.Error()})
 			return
 		}
 		defer sub.Unsubscribe()
