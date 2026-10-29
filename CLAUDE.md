@@ -24,6 +24,7 @@ See `docs/architecture.md`. In short: `cmd/natsmin` (server), `internal/api` (hu
 
 ## Conventions
 
+- Every command-line interface uses [clyops](https://clyops.io) (`github.com/wankdanker/clyops/packages/go`), never the `flag` package. Each command declares its effects (`read-only`, `idempotent`, `destructive`, `network`) and `SetStdout(..., "application/json")` when it prints JSON; credentials use the `secret` rule; option variables are the documented environment variable names (`NATSMIN_*`). Nothing (database, NATS, network) may run before `Run()` returns. `--help-json-schema` must validate against clyops' `spec/schema.json`.
 - JetStream stream and consumer configs are passed through in native NATS JSON; do not invent parallel DTOs for them.
 - Handlers return empty slices, never nil (arrays are documented as non-nullable).
 - Destructive UI actions need a confirm dialog; irreversible ones use type-to-confirm.

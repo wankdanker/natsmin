@@ -27,6 +27,13 @@ jobs:
           test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
       - name: Test (starts in-process NATS superclusters)
         run: go test -race ./...
+      - name: CLI interfaces conform to clyops
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/wankdanker/clyops/packages/go/v0.9.0/spec/schema.json -o /tmp/clyops-schema.json
+          pip install --quiet jsonschema
+          go run ./cmd/natsmin --help-json-schema > /tmp/natsmin.json
+          go run ./cmd/natsmin-devcluster --help-json-schema > /tmp/devcluster.json
+          python3 -c "import json,jsonschema,sys; s=json.load(open('/tmp/clyops-schema.json')); [jsonschema.Draft202012Validator(s).validate(json.load(open(f))) for f in sys.argv[1:]]; print('ok')" /tmp/natsmin.json /tmp/devcluster.json
       - name: OpenAPI document is up to date
         run: |
           go run ./cmd/natsmin openapi > /tmp/openapi.json
