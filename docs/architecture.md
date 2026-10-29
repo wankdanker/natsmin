@@ -17,8 +17,8 @@ browser ──HTTP/SSE──▶ natsmin (one Go binary)
 
 | Path | |
 |---|---|
-| `cmd/natsmin` | The server. Flags/env, admin bootstrap, `natsmin openapi`. |
-| `cmd/natsmin-devcluster` | In-process supercluster for development, with optional demo traffic. |
+| `cmd/natsmin` | The CLI, built with [clyops](https://clyops.io): `serve` (options and env, admin bootstrap, HTTP server), `openapi`, `version`. |
+| `cmd/natsmin-devcluster` | In-process supercluster for development, with optional demo traffic (clyops CLI). |
 | `internal/api` | HTTP API. One file per area; every route is registered with `reg()` so it gets a role requirement, OpenAPI docs and auditing. |
 | `internal/natsx` | NATS side: connections, system requests, the poller and topology snapshots. |
 | `internal/store` | SQLite persistence (pure Go driver, no CGO). Credentials are sealed with `internal/secret` before they are written. |

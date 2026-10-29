@@ -84,13 +84,13 @@ Images are published for `linux/amd64` and `linux/arm64`.
 Download an archive for Linux, macOS, Windows or FreeBSD from the [latest release](https://github.com/wankdanker/natsmin/releases/latest), then run:
 
 ```bash
-./natsmin
+./natsmin serve
 ```
 
 **From source**
 
 ```bash
-make ui build && ./bin/natsmin
+make ui build && ./bin/natsmin serve
 ```
 
 Open http://localhost:8080 and create the admin account. Then add a system. You need:
@@ -106,11 +106,11 @@ Operator mode (JWT) and static config auth both work.
 The `natsmin-devcluster` tool starts two 3-node clusters (`east`, `west`) joined by gateways, plus a leafnode, in a single process, and can generate demo traffic. It is included in the release archives.
 
 ```bash
-go run ./cmd/natsmin-devcluster -demo
+go run ./cmd/natsmin-devcluster --demo
 ```
 
 ```bash
-go run ./cmd/natsmin
+go run ./cmd/natsmin serve
 ```
 
 Add a system with URL `nats://localhost:4222`, system account `sys` / `sys`, and an account connection `app` / `app`.
@@ -123,7 +123,7 @@ docker compose up --build
 
 ## Configuration
 
-Flags or environment variables:
+Options of `natsmin serve`, as flags or environment variables (run `natsmin serve --help` for the full list):
 
 | Variable | Default | |
 |---|---|---|
@@ -137,7 +137,9 @@ Flags or environment variables:
 | `NATSMIN_TLS_CERT`, `NATSMIN_TLS_KEY` | | Serve HTTPS directly |
 | `NATSMIN_LOG_JSON` | `false` | JSON logs |
 
-`natsmin openapi` prints the OpenAPI document.
+Every option has a flag named after the variable (`NATSMIN_ADDR` is `--addr`). Precedence is flag, then environment, then default.
+
+natsmin's commands are [clyops](https://clyops.io) commands with declared effects. `natsmin openapi` and `natsmin version` print JSON, and `natsmin --help-json-schema` describes the whole interface, so `clyops-api` and `clyops-mcp` can serve them.
 
 ## Roles
 
